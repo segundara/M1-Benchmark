@@ -31,19 +31,46 @@
     -->
 
   <head>
-    
+    <style>
+      #container {
+            display: grid;
+            justify-content: center;
+            grid-template-columns: auto;
+            grid-template-rows   : auto;
+            grid-template-areas:
+            "title"   "title"     "title"
+            "quiz"    "quiz"      "quiz"
+            "control" "control"   "control"
+            "result"  "result"    "result";
+            grid-row-gap: 1em;
+        }
+        .title {
+            grid-area: title;
+        }
+        .quiz {
+            grid-area: quiz;
+        }
+        .control {
+            grid-area: control;
+        }
+        .result {
+            grid-area: result;
+        }
+    </style>
   </head>
   <body>
     <section id="container">
-      <h1>Quiz for Fun</h1>
-      <div id="quiz"></div>
-      <div>
-        <span><h3>Make a choice</h3></span>
-        <input type="button" value="Type A" onclick="getTypeA()">
-        <input type="button" value="Type B" onclick="getTypeB()">
+      <h1 class="title">Quiz for Fun</h1>
+      <div id="quiz" class="quiz"></div>
+      <br>
+      <div class="control">
+        <!--<span><h3>Make a choice</h3></span>-->
+        <input type="button" value="Start Quiz" onclick="getQuiz()">
+        <!--<input type="button" value="Type B" onclick="getTypeB()">-->
         <button id="submit">Submit Quiz</button>
       </div>
-      <div id="results"></div>
+      <br>
+      <div id="results" class="result"></div>
 
     </section>
     <script>
@@ -133,7 +160,7 @@
         },
       ]
       
-      function getTypeA(){
+      function getQuiz(){
         const output = [];
 
         for (let i = 0; i < questions.length; i++) {
@@ -169,7 +196,7 @@
 
       }
 
-      function showResults(){
+      function displayResult(){
 
           const answerContainers = quizContainer.querySelectorAll('.answers');
 
@@ -198,7 +225,7 @@
       let resultsContainer = document.querySelector('#results');
       let submitButton = document.querySelector('#submit');
 
-      submitButton.addEventListener('click', showResults);
+      submitButton.addEventListener('click', displayResult);
 
       window.onload = function () {
         //IF YOU ARE DISPLAYING ALL THE QUESTIONS TOGETHER:
