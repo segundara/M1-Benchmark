@@ -38,17 +38,17 @@
             grid-template-columns: auto;
             grid-template-rows   : auto;
             grid-template-areas:
-            "title"   "title"     "title"
-            "quiz"    "quiz"      "quiz"
-            "control" "control"   "control"
-            "result"  "result"    "result";
+            "title"   "title"    "title"
+            "myQuiz"  "myQuiz"   "myQuiz"
+            "control" "control"  "control"
+            "result"  "result"   "result";
             grid-row-gap: 1em;
         }
         .title {
             grid-area: title;
         }
-        .quiz {
-            grid-area: quiz;
+        .myQuiz {
+            grid-area: myQuiz;
         }
         .control {
             grid-area: control;
@@ -61,11 +61,11 @@
   <body>
     <section id="container">
       <h1 class="title">Quiz for Fun</h1>
-      <div id="quiz" class="quiz"></div>
+      <div id="quiz" class="myQuiz"></div>
       <br>
       <div class="control">
         <!--<span><h3>Make a choice</h3></span>-->
-        <input type="button" value="Start Quiz" onclick="getQuiz()">
+        <input type="button" value="Start Quiz" onclick="getQuiz()" id="quizButton">
         <!--<input type="button" value="Type B" onclick="getTypeB()">-->
         <button id="submit">Submit Quiz</button>
       </div>
