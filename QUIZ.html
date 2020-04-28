@@ -32,41 +32,109 @@
 
   <head>
     <style>
-      #container {
-            display: grid;
-            justify-content: center;
-            grid-template-columns: auto;
-            grid-template-rows   : auto;
-            grid-template-areas:
-            "title"   "title"    "title"
-            "myQuiz"  "myQuiz"   "myQuiz"
-            "control" "control"  "control"
-            "result"  "result"   "result";
-            grid-row-gap: 1em;
+        @import url(https://fonts.googleapis.com/css?family=Work+Sans:300,600);
+
+        body{
+            font-size: 20px;
+            font-family: 'Work Sans', sans-serif;
+            color: #333;
+            font-weight: 300;
+            text-align: center;
+            background-color: #f8f6f0;
         }
-        .title {
-            grid-area: title;
+        h1{
+            font-weight: 300;
+            margin: 0px;
+            padding: 10px;
+            font-size: 20px;
+            background-color: #38a;
+            color: #fff;
         }
-        .myQuiz {
-            grid-area: myQuiz;
+        .question{
+            font-size: 30px;
+            margin-bottom: 10px;
         }
-        .control {
-            grid-area: control;
+        button{
+            font-family: 'Work Sans', sans-serif;
+            font-size: 22px;
+            background-color: #279;
+            color: #fff;
+            border: 0px;
+            border-radius: 3px;
+            padding: 20px;
+            cursor: pointer;
+            margin-top: 20px;
         }
-        .result {
-            grid-area: result;
+        button:hover{
+            background-color: #38a;
         }
+        .slide{
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .active-slide{
+            opacity: 1;
+            z-index: 2;
+        }
+        .quiz-container{
+            position: relative;
+            height: 200px;
+            margin-top: 40px;
+        }
+
+        .answers {
+          display: inline-block;
+          padding: 0 6px;
+          margin: 10px 0 0;
+        }
+
+        .answers label {
+          font-weight: normal;
+        }
+
+        .answers label:after {
+          content: "";
+          display: inline-block;
+          position: relative;
+          top: 5px;
+          right: 22px;
+          margin: 0 5px 5px 5px;
+          width: 10px;
+          height: 10px;
+          border-radius: 11px;
+          border: 2px solid #004c97;
+          background-color: transparent;}
+
+        .answers input[type=radio]:checked + label:before {
+          border-radius: 11px;
+          width: 12px;
+          height: 12px;
+          position: absolute;
+          top: 11px;
+          left: 12px;
+          content: " ";
+          display: block;
+          background: #004c97;
+        } 
+
     </style>
   </head>
   <body>
     <section id="container">
-      <h1 class="title">Quiz for Fun</h1>
-      <div id="quiz" class="myQuiz"></div>
+      <h1 class="title">Quiz For Fun</h1>
+      <div class="quiz-container">
+        <div id="quiz" class="myQuiz"></div>
+      </div>
+      
       <br>
       <div class="control">
-        <!--<span><h3>Make a choice</h3></span>-->
-        <input type="button" value="Start Quiz" onclick="getQuiz()" id="quizButton">
-        <!--<input type="button" value="Type B" onclick="getTypeB()">-->
+        <button id="previous">Previous Question</button>
+        <button id="next">Next Question</button>
         <button id="submit">Submit Quiz</button>
       </div>
       <br>
@@ -75,7 +143,123 @@
     </section>
     <script>
       
+      window.onload = function () {
 
+      const output = [];
+
+      /******************************************************************************/
+      function showquestions(){
+        for (let i = 0; i < questions.length; i++) {
+
+          questions[i].incorrect_answers.push(questions[i].correct_answer)
+          let allAnswers = [...questions[i].incorrect_answers]
+          
+          var slide = document.createElement("div");
+          var question = document.createElement("div");
+          var answers = document.createElement("div");
+
+          
+          for (let j = 0; j < allAnswers.length; j++) {
+
+            
+            var newLabel = document.createElement('LABEL');
+            var newInput = document.createElement('input');
+
+            slide.className = 'slide';
+            question.className = 'question';
+            answers.className = 'answers';
+
+            
+            newInput.type = 'radio';
+            newInput.name = `question${i}`;
+            newInput.value = `${allAnswers[j]}`;
+            newLabel.innerHTML=`${allAnswers[j]}`;
+
+            question.innerText = `${questions[i].question}`;
+
+            newLabel.appendChild(newInput);
+            answers.appendChild(newLabel);
+
+            slide.appendChild(question);
+            slide.appendChild(answers);
+          }
+
+          quizContainer.appendChild(slide);
+        }
+
+
+        /**********************************************************************************/
+        // var i = 0; var n = [];
+        // //const answerContainers = quizContainer.querySelectorAll('.answers');
+        // (function loop() {
+        //     quizContainer.innerHTML = output[i];
+        //     const answerContainers = quizContainer.querySelectorAll('.answers');
+        //     console.log(answerContainers[0])             
+        //     if (++i < questions.length) {
+        //         setTimeout(loop, 5000);
+        //     }
+        // })(); 
+
+      }
+          /******************************************************************************/
+
+      function displayResult(){
+
+          const answerContainers = quizContainer.querySelectorAll('.answers');
+
+          let counter = 0;
+
+          for (let i = 0; i < questions.length; i++) {
+
+            const answerContainer = answerContainers[i];
+            const checked = `input[name=question${i}]:checked`;
+            const userChoice = (answerContainer.querySelector(checked) || {}).value;
+            
+            if(userChoice === questions[i].correct_answer){
+                counter++;
+                answerContainers[i].style.color = 'lightgreen';
+            }
+            else{
+                answerContainers[i].style.color = 'red';
+            }
+            
+          }
+          resultsContainer.innerHTML = `Your score is ${counter} out of ${questions.length}`;
+      }
+
+      function showSlide(n) {
+            slides[currentSlide].classList.remove('active-slide');
+            slides[n].classList.add('active-slide');
+            currentSlide = n;
+            if(currentSlide === 0){
+            previousButton.style.display = 'none';
+            }
+            else{
+            previousButton.style.display = 'inline-block';
+            }
+            if(currentSlide === slides.length-1){
+            nextButton.style.display = 'none';
+            submitButton.style.display = 'inline-block';
+            }
+            else{
+            nextButton.style.display = 'inline-block';
+            submitButton.style.display = 'none';
+            }
+        }
+
+        function showNextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function showPreviousSlide() {
+            showSlide(currentSlide - 1);
+        }
+      
+      
+      let quizContainer = document.querySelector('#quiz');
+      let resultsContainer = document.querySelector('#results');
+      let submitButton = document.querySelector('#submit');
+          
       var questions = [
         {
           category: 'Science: Computers',
@@ -160,74 +344,23 @@
         },
       ]
       
-      function getQuiz(){
-        const output = [];
+      showquestions()
 
-        for (let i = 0; i < questions.length; i++) {
-          //const element = array[i];
-          let allAnswers = [];
-          let answers = [];
+      // Pagination
+      const previousButton = document.querySelector("#previous");
+      const nextButton = document.querySelector("#next");
+      const slides = document.querySelectorAll(".slide");
+      let currentSlide = 0;
 
-          questions[i].incorrect_answers[questions[i].incorrect_answers.length] = questions[i].correct_answer
-          
-          allAnswers = [...questions[i].incorrect_answers]
-          //console.log(allAnswers)
+      // Show the first slide
+      showSlide(currentSlide);
 
-          for (let j = 0; j < allAnswers.length; j++) {
-            answers.push(
-              `<label>
-              <input type="radio" name="question${i}" value="${allAnswers[j]}">
-              ${allAnswers[j]}
-              </label>`
-            );
-          //console.log(allAnswers[i])
-            
-          }
-
-          output.push(
-          `<div class="slide">
-              <div class="question"> ${questions[i].question} </div>
-              <div class="answers"> ${answers} </div>
-          </div>`
-          );
-        }
-
-        quizContainer.innerHTML = output.join('');
-
-      }
-
-      function displayResult(){
-
-          const answerContainers = quizContainer.querySelectorAll('.answers');
-
-          let counter = 0;
-
-          for (let i = 0; i < questions.length; i++) {
-            const answerContainer = answerContainers[i];
-            const checked = `input[name=question${i}]:checked`;
-            const userChoice = (answerContainer.querySelector(checked) || {}).value;
-            //console.log(userChoice)
-            if(userChoice === questions[i].correct_answer){
-                counter++;
-                answerContainers[i].style.color = 'lightgreen';
-            }
-            else{
-                answerContainers[i].style.color = 'red';
-            }
-            
-          }
-          resultsContainer.innerHTML = `Your score is ${counter} out of ${questions.length}`;
-      }
-
-      
-      
-      let quizContainer = document.querySelector('#quiz');
-      let resultsContainer = document.querySelector('#results');
-      let submitButton = document.querySelector('#submit');
-
+      // Event listeners
       submitButton.addEventListener('click', displayResult);
+      previousButton.addEventListener("click", showPreviousSlide);
+      nextButton.addEventListener("click", showNextSlide);
 
-      window.onload = function () {
+
         //IF YOU ARE DISPLAYING ALL THE QUESTIONS TOGETHER:
         //HINT: for each question, create a container with the "question"
         //create a radio button https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/radio with, as option the both the correct answer and the incorrect answers
