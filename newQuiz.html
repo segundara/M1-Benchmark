@@ -29,6 +29,9 @@
         / Let the user select difficulty and number of questions (you can get q/a from https://opentdb.com/api.php?amount=10&category=18&difficulty=easy modifying amount and difficulty)
 
     -->
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
   <head>
     <style>
@@ -52,6 +55,14 @@
         background-color: #004c97;
         color: #fff;
       }
+      .card{
+          height: 100%;
+          width: 50%;
+          margin: auto;
+      }
+      .card .input-group *{
+          width: 100%;
+      }
       .question{
         font-size: 30px;
         margin-bottom: 10px;
@@ -63,9 +74,9 @@
       }
       .answers label{
         display: block;
-        margin-bottom: 10px;
+        margin-bottom: 20px;
         position: relative;
-        margin-top: 20px;
+        margin-top: 10px;
       }
       button{
         font-family: 'Work Sans', sans-serif;
@@ -108,7 +119,7 @@
         content: "";
         display: block;
         position: absolute;
-        top: 1px;
+        top: 5px;
         left: -35px;
         margin: 0 5px 5px 5px;
         width: 20px;
@@ -120,11 +131,11 @@
 
       .answers input[type=radio]:checked + label::after {
         border-radius: 11px;
-        width: 12px;
-        height: 12px;
+        width: 10px;
+        height: 10px;
         position: absolute;
-        top: 7px;
-        left: -24px;
+        top: 10px;
+        left: -25px;
         content: " ";
         display: block;
         background: #004c97;
@@ -147,6 +158,63 @@
   <body>
     <section id="container">
       <h1 class="title">Quiz For Fun</h1>
+      <!-- <div class="row"></div> -->
+      <div class="card pre">
+        <div class="input-group">
+            <label for="trivia_amount">Select Number of Questions:</label>
+            <input type="number" name="trivia_amount" id="trivia_amount" class="form-control" min="1" max="50" value="10">
+        </div>
+        <div class="input-group">
+            <label for="trivia_category">Select Category: </label>
+            <select class="custom-select" id="inputGroupSelect02" aria-label="Example select with button addon">
+                <option value="">Any Category</option>
+                <option value="9">General Knowledge</option>
+                <option value="10">Entertainment: Books</option>
+                <option value="11">Entertainment: Film</option>
+                <option value="12">Entertainment: Music</option>
+                <option value="13">Entertainment: Musicals &amp; Theatres</option>
+                <option value="14">Entertainment: Television</option>
+                <option value="15">Entertainment: Video Games</option>
+                <option value="16">Entertainment: Board Games</option>
+                <option value="17">Science &amp; Nature</option>
+                <option value="18">Science: Computers</option>
+                <option value="19">Science: Mathematics</option>
+                <option value="20">Mythology</option>
+                <option value="21">Sports</option>
+                <option value="22">Geography</option>
+                <option value="23">History</option>
+                <option value="24">Politics</option>
+                <option value="25">Art</option>
+                <option value="26">Celebrities</option>
+                <option value="27">Animals</option>
+                <option value="28">Vehicles</option>
+                <option value="29">Entertainment: Comics</option>
+                <option value="30">Science: Gadgets</option>
+                <option value="31">Entertainment: Japanese Anime &amp; Manga</option>
+                <option value="32">Entertainment: Cartoon &amp; Animations</option>	
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="trivia_difficulty">Select Difficulty: </label>
+            <select class="custom-select" id="inputGroupSelect03" aria-label="Example select with button addon">
+                <option value="">Any Difficulty</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="trivia_type">Select Type: </label>
+            <select class="custom-select" id="inputGroupSelect04" aria-label="Example select with button addon">
+              <option value="">Any Type</option>
+              <option value="multiple">Multiple</option>
+              <option value="boolean">True/False</option>
+            </select>
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" type="button" id="start">Start Quiz</button>
+            </div>
+        </div>
+      </div>
       <div class="quiz-container">
         <div id="quiz" class="myQuiz"></div>
       </div>
@@ -160,21 +228,55 @@
       <br>
       <div id="results" class="result"></div>
     </section>
+
     <script>
+
+        document.querySelector('.control').style.display = 'none'
+        document.querySelector('.input-group').style.display = 'block'
+        let startBtn = document.querySelector('#start')
+        
+        startBtn.addEventListener('click', startQuiz);
+       
+      function startQuiz() {
+        
+        let a = document.querySelector('#trivia_amount').value;
+        let b = document.querySelector('#inputGroupSelect02').value;
+        let c = document.querySelector('#inputGroupSelect03').value;
+        let d = document.querySelector('#inputGroupSelect04').value;
+        
+        document.querySelector('.control').style.display = 'block'
+        document.querySelector('.pre').style.display = 'none'
+          
       
-      window.onload = function () {
+      let quizContainer = document.querySelector('#quiz');
+      let resultsContainer = document.querySelector('#results');
+      let submitButton = document.querySelector('#submit');
+          
+      //console.log(opt)
 
-      const output = [];
+      let params = {
+        "amount": a,
+        "category": b,
+        "difficulty": c,
+        "type": d
+      };
 
-      /***************************************/
-      // fetch('https://opentdb.com/api.php?amount=10&difficulty=easy')
-      //   .then(res => res.json())
-      //   .then((out) => {
-      //       console.log('Output: ', out);
-      // }).catch(err => console.error(err));
+        let query = Object.keys(params)
+             .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+             .join('&');
 
-      /******************************************************************************/
-      function showquestions(){
+      let url = 'https://opentdb.com/api.php?' + query
+      console.log(url)
+
+       /***************************************/
+    fetch(url)
+    //fetch('https://opentdb.com/api.php?amount=10&difficulty=easy')
+    .then(res => res.json())
+    .then(data => {
+        // code to handle the response
+        const questions = data.results
+        //console.log(questions)
+        function showquestions(){
         for (let i = 0; i < questions.length; i++) {
 
           questions[i].incorrect_answers.push(questions[i].correct_answer)
@@ -216,48 +318,33 @@
 
           quizContainer.appendChild(slide);
         }
+    }
 
+    function displayResult(){
 
-        /**********************************************************************************/
-        // var i = 0; var n = [];
-        // //const answerContainers = quizContainer.querySelectorAll('.answers');
-        // (function loop() {
-        //     quizContainer.innerHTML = output[i];
-        //     const answerContainers = quizContainer.querySelectorAll('.answers');
-        //     console.log(answerContainers[0])             
-        //     if (++i < questions.length) {
-        //         setTimeout(loop, 5000);
-        //     }
-        // })(); 
+    const answerContainers = quizContainer.querySelectorAll('.answers');
 
-      }
-          /******************************************************************************/
+    let counter = 0;
 
-      function displayResult(){
+    for (let i = 0; i < questions.length; i++) {
 
-          const answerContainers = quizContainer.querySelectorAll('.answers');
+    const answerContainer = answerContainers[i];
+    const checked = `input[name=question${i}]:checked`;
+    const userChoice = (answerContainer.querySelector(checked) || {}).value;
+    
+    if(userChoice === questions[i].correct_answer){
+        counter++;
+        answerContainers[i].style.color = 'lightgreen';
+    }
+    else{
+        answerContainers[i].style.color = 'red';
+    }
+    
+    }
+    resultsContainer.innerHTML = `Your score is ${counter} out of ${questions.length}`;
+    }
 
-          let counter = 0;
-
-          for (let i = 0; i < questions.length; i++) {
-
-            const answerContainer = answerContainers[i];
-            const checked = `input[name=question${i}]:checked`;
-            const userChoice = (answerContainer.querySelector(checked) || {}).value;
-            
-            if(userChoice === questions[i].correct_answer){
-                counter++;
-                answerContainers[i].style.color = 'lightgreen';
-            }
-            else{
-                answerContainers[i].style.color = 'red';
-            }
-            
-          }
-          resultsContainer.innerHTML = `Your score is ${counter} out of ${questions.length}`;
-      }
-
-      function showSlide(n) {
+    function showSlide(n) {
             slides[currentSlide].classList.remove('active-slide');
             slides[n].classList.add('active-slide');
             currentSlide = n;
@@ -284,114 +371,8 @@
         function showPreviousSlide() {
             showSlide(currentSlide - 1);
         }
-      
-      
-      let quizContainer = document.querySelector('#quiz');
-      let resultsContainer = document.querySelector('#results');
-      let submitButton = document.querySelector('#submit');
-          
-      var questions = [
-        {
-          category: 'Science: Computers',
-          type: 'multiple',
-          difficulty: 'easy',
-          question: 'What does CPU stand for?',
-          correct_answer: 'Central Processing Unit',
-          incorrect_answers: ['Central Process Unit', 'Computer Personal Unit', 'Central Processor Unit'],
-        },
-        {
-          category: 'Science: Computers',
-          type: 'multiple',
-          difficulty: 'easy',
-          question:
-            "In the programming language Java, which of these keywords would you put on a variable to make sure it doesn't get modified?",
-          correct_answer: 'Final',
-          incorrect_answers: ['Static', 'Private', 'Public'],
-        },
-        {
-          category: 'Science: Computers',
-          type: 'boolean',
-          difficulty: 'easy',
-          question: 'The logo for Snapchat is a Bell.',
-          correct_answer: 'False',
-          incorrect_answers: ['True'],
-        },
-        {
-          category: 'Science: Computers',
-          type: 'boolean',
-          difficulty: 'easy',
-          question: 'Pointers were not used in the original C programming language; they were added later on in C++.',
-          correct_answer: 'False',
-          incorrect_answers: ['True'],
-        },
-        {
-          category: 'Science: Computers',
-          type: 'multiple',
-          difficulty: 'easy',
-          question: 'What is the most preferred image format used for logos in the Wikimedia database?',
-          correct_answer: '.svg',
-          incorrect_answers: ['.png', '.jpeg', '.gif'],
-        },
-        {
-          category: 'Science: Computers',
-          type: 'multiple',
-          difficulty: 'easy',
-          question: 'In web design, what does CSS stand for?',
-          correct_answer: 'Cascading Style Sheet',
-          incorrect_answers: ['Counter Strike: Source', 'Corrective Style Sheet', 'Computer Style Sheet'],
-        },
-        {
-          category: 'Science: Computers',
-          type: 'multiple',
-          difficulty: 'easy',
-          question: 'What is the code name for the mobile operating system Android 7.0?',
-          correct_answer: 'Nougat',
-          incorrect_answers: ['Ice Cream Sandwich', 'Jelly Bean', 'Marshmallow'],
-        },
-        {
-          category: 'Science: Computers',
-          type: 'multiple',
-          difficulty: 'easy',
-          question: 'On Twitter, what is the character limit for a Tweet?',
-          correct_answer: '140',
-          incorrect_answers: ['120', '160', '100'],
-        },
-        {
-          category: 'Science: Computers',
-          type: 'boolean',
-          difficulty: 'easy',
-          question: 'Linux was first created as an alternative to Windows XP.',
-          correct_answer: 'False',
-          incorrect_answers: ['True'],
-        },
-        {
-          category: 'Science: Computers',
-          type: 'multiple',
-          difficulty: 'easy',
-          question: 'Which programming language shares its name with an island in Indonesia?',
-          correct_answer: 'Java',
-          incorrect_answers: ['Python', 'C', 'Jakarta'],
-        },
-      ]
 
-       /***************************************/
-      //  const url = 'https://opentdb.com/api.php?amount=10&difficulty=easy'
-      // let arr = []
-      //  function getData(url) {
-      //   return fetch(url)
-      //   .then(response => response.json())
-      //   .then(result => arr.push(...result));
-      // }
-
-      // let arr = []
-      // getData('https://opentdb.com/api.php?amount=10&difficulty=easy')
-      //   .then(result => arr.push(...result));
-        
-
-      //console.log(arr)
-
-      
-      showquestions()
+    showquestions()
 
       // Pagination
       const previousButton = document.querySelector("#previous");
@@ -406,6 +387,10 @@
       submitButton.addEventListener('click', displayResult);
       previousButton.addEventListener("click", showPreviousSlide);
       nextButton.addEventListener("click", showNextSlide);
+
+    }).catch(err => {
+        console.error('Error: ', err);
+    });
 
 
         //IF YOU ARE DISPLAYING ALL THE QUESTIONS TOGETHER:
@@ -422,5 +407,12 @@
       //If you are presenting all questions together, just take all the radio buttons and check if the selected answer === correct_answer
       //If you are presenting one question at a time, just add one point or not to the user score if the selected answer === correct_answer
     </script>
+
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
   </body>
 </html>
